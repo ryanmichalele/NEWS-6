@@ -6,7 +6,7 @@ import { createClient } from "@sanity/client";
  * public content, never a credential.
  */
 
-const projectId = process.env.SANITY_PROJECT_ID || "c558ki6i";
+const projectId = process.env.SANITY_PROJECT_ID || "9u0n5wib";
 const dataset = process.env.SANITY_DATASET || "production";
 
 const CONTENT_QUERY = `{
