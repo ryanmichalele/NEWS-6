@@ -1,8 +1,6 @@
 import { useLayoutEffect, useMemo, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import Turnstile from "./components/Turnstile";
-import { TURNSTILE_SITE_KEY } from "./config";
 import heroArrest from "./assets/hero-arrest.jpg";
 import { EntityProvider, EntityText } from "./sanity/EntityText";
 import { useStoryContent, type InitialContent } from "./sanity/useStoryContent";
@@ -13,25 +11,23 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 function AppShell({ article }: { article: StaticArticle }) {
   const [email, setEmail] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
   const doubledTicker = [...article.tickerItems, ...article.tickerItems];
 
   const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!turnstileToken || status === "submitting") return;
+    if (status === "submitting") return;
 
     setStatus("submitting");
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, token: turnstileToken }),
+        body: JSON.stringify({ email }),
       });
       if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);
       setEmail("");
-      setTurnstileToken("");
       setStatus("success");
     } catch {
       setStatus("error");
@@ -431,7 +427,7 @@ function AppShell({ article }: { article: StaticArticle }) {
                 <EntityText>{article.newsletterBlurb}</EntityText>
               </p>
             </div>
-            <form
+<form
               className="flex w-full max-w-md flex-col gap-3"
               onSubmit={handleSubscribe}
             >
@@ -454,22 +450,6 @@ function AppShell({ article }: { article: StaticArticle }) {
                 </button>
               </div>
 
-              <Turnstile
-                siteKey={TURNSTILE_SITE_KEY}
-                onVerify={(token) => {
-                  setTurnstileToken(token);
-                  setStatus("idle");
-                }}
-                onExpire={() => {
-                  setTurnstileToken("");
-                  setStatus("idle");
-                }}
-                onError={() => {
-                  setTurnstileToken("");
-                  setStatus("error");
-                }}
-              />
-
               <p
                 aria-live="polite"
                 className="min-h-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500"
@@ -479,8 +459,7 @@ function AppShell({ article }: { article: StaticArticle }) {
                   : status === "error"
                     ? "Something went wrong. Please try again."
                     : ""}
-              </p>
-            </form>
+              </form>
           </div>
         </section>
       </main>
