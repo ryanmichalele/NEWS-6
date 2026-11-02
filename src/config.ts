@@ -1,3 +1,3 @@
 export const TURNSTILE_SITE_KEY =
   import.meta.env.VITE_TURNSTILE_SITE_KEY ??
-  "0x4AAAAAAFZTNnwkkNwwHmnd";
+  "0x4AAAAAAFwwFo0C8rUp0GyP";
