@@ -5,13 +5,16 @@ import heroArrest from "./assets/hero-arrest.jpg";
 import { EntityProvider, EntityText } from "./sanity/EntityText";
 import { useStoryContent, type InitialContent } from "./sanity/useStoryContent";
 import { resolveEntities } from "./sanity/resolveEntities";
+import Turnstile from "./components/Turnstile";
 import type { StaticArticle } from "./data/fallback";
+import { cn } from "@/utils/cn";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 function AppShell({ article }: { article: StaticArticle }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const doubledTicker = [...article.tickerItems, ...article.tickerItems];
 
@@ -24,7 +27,7 @@ function AppShell({ article }: { article: StaticArticle }) {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, "cf-turnstile-response": turnstileToken }),
       });
       if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);
       setEmail("");
@@ -426,40 +429,47 @@ function AppShell({ article }: { article: StaticArticle }) {
               <p className="mt-2 max-w-xl text-sm font-medium text-zinc-600">
                 <EntityText>{article.newsletterBlurb}</EntityText>
               </p>
-            </div>
-<form
-              className="flex w-full max-w-md flex-col gap-3"
-              onSubmit={handleSubscribe}
-            >
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email address"
-                  className="w-full border-4 border-black bg-white px-4 py-3 text-sm font-medium outline-none focus:border-red-600"
-                />
-                <button
-                  type="submit"
-                  disabled={status === "submitting" || !turnstileToken}
-                  className="bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-[0.35em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-400"
-                >
-                  {status === "submitting" ? "Sending" : "Notify me"}
-                </button>
-              </div>
-
-              <p
-                aria-live="polite"
-                className="min-h-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500"
+              <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onVerify={(token) => setTurnstileToken(token)}
+                onError={() => setTurnstileToken(null)}
+                className="mt-3"
+              />
+              <form
+                className="flex w-full max-w-md flex-col gap-3"
+                onSubmit={handleSubscribe}
               >
-                {status === "success"
-                  ? "You're on the list. Watch your inbox."
-                  : status === "error"
-                    ? "Something went wrong. Please try again."
-                    : ""}
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    className="w-full border-4 border-black bg-white px-4 py-3 text-sm font-medium outline-none focus:border-red-600"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "submitting" || !turnstileToken}
+                    className="bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-[0.35em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-zinc-400"
+                  >
+                    {status === "submitting" ? "Sending" : "Notify me"}
+                  </button>
+                </div>
+
+                <p
+                  aria-live="polite"
+                  className="min-h-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500"
+                >
+                  {status === "success"
+                    ? "You're on the list. Watch your inbox."
+                    : status === "error"
+                      ? "Something went wrong. Please try again."
+                      : ""}
+                </p>
               </form>
+            </div>
           </div>
         </section>
       </main>
