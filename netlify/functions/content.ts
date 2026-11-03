@@ -6,15 +6,15 @@ import { createClient } from "@sanity/client";
  * public content, never a credential.
  */
 
-const projectId = process.env.SANITY_PROJECT_ID || "9u0n5wib";
+const projectId = process.env.SANITY_PROJECT_ID || "bl5nnct1";
 const dataset = process.env.SANITY_DATASET || "production";
 
 const CONTENT_QUERY = `{
-  "settings": *[_type == "storySettings"][0]{
+  "settings": *[_id == "storySettings"][0]{
     bankName, locationName, advisorName,
     bankKey, locationKey, advisorKey
   },
-  "article": *[_type == "article"][0]{
+  "article": *[_id == "article"][0]{
     outlet, section, kicker, title, dek, byline,
     published, updated, readTime, location, heroCaption,
     tickerItems, editorNote, bodySections, quotes, timeline,
@@ -31,6 +31,7 @@ const client = createClient({
   projectId,
   dataset,
   apiVersion: "2024-01-01",
+  perspective: "published",
   token: process.env.SANITY_READ_TOKEN,
   // Live API, not the cached API CDN. The CDN caches authenticated responses
   // (segmented per token) and serves them for a short window, so a Studio edit
@@ -50,7 +51,7 @@ const client = createClient({
  */
 type CacheEntry = { data: string; expiresAt: number };
 
-const MEMORY_TTL_MS = 0;
+const MEMORY_TTL_MS = 1000;
 let cache: CacheEntry | null = null;
 /** De-duplicates concurrent misses so a burst triggers one Sanity query. */
 let inflight: Promise<CacheEntry> | null = null;

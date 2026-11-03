@@ -4,10 +4,10 @@
  * resolution the browser performs, then counts what a visitor would see.
  */
 
-const SITE = process.argv[2] || "https://cnn-news-netlify.netlify.app";
+const SITE = process.argv[2] || "https://cwn-bank-news.netlify.app";
 
 const OLD = ["Edward Jones", "Louisiana", "Beau Wilson"];
-const NEW = ["Wells Fargo", "Texas", "Dana Reyes"];
+const NEW = ["JP MORGAN", "CARLIFORNIA", "RYAN JONNAS"];
 
 type Payload = {
   settings: { bankName: string; locationName: string; advisorName: string } | null;

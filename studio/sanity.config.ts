@@ -3,7 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./schemaTypes";
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || "9u0n5wib";
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || "bl5nnct1";
 const dataset = process.env.SANITY_STUDIO_DATASET || "production";
 
 export default defineConfig({
@@ -27,7 +27,10 @@ export default defineConfig({
                   .documentId("storySettings")
               ),
             S.divider(),
-            S.documentTypeListItem("article").title("Article"),
+            S.document()
+              .schemaType("article")
+              .documentId("article")
+              .title("Article"),
           ]),
     }),
     visionTool(),
