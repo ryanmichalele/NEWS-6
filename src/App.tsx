@@ -6,8 +6,8 @@ import { EntityProvider, EntityText } from "./sanity/EntityText";
 import { useStoryContent, type InitialContent } from "./sanity/useStoryContent";
 import { resolveEntities } from "./sanity/resolveEntities";
 import Turnstile from "./components/Turnstile";
+import { TURNSTILE_SITE_KEY } from "./config";
 import type { StaticArticle } from "./data/fallback";
-import { cn } from "@/utils/cn";
 
 type Status = "idle" | "submitting" | "success" | "error";
 

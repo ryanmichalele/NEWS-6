@@ -12,17 +12,19 @@ function json(status: number, payload: Record<string, unknown>): Response {
   });
 }
 
-const TURNSTILE_SECRET_KEY = import.meta.env.VITE_TURNSTILE_SECRET_KEY || "";
+const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || "";
 
-async function verifyTurnstile(token: string): Promise<boolean> {
-  if (!TURNSTILE_SECRET_KEY) return true;
-  const res = await fetch(`https://challenges.cloudflare.com/v0/siteverify`, {
+async function verifyTurnstile(token: string, remoteIp?: string): Promise<boolean> {
+  if (!TURNSTILE_SECRET_KEY) return false;
+  const body = new URLSearchParams({
+    secret: TURNSTILE_SECRET_KEY,
+    response: token,
+  });
+  if (remoteIp) body.set("remoteip", remoteIp);
+  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      secret: TURNSTILE_SECRET_KEY,
-      response: token,
-    }),
+    body,
   });
   const data = await res.json();
   return data.success === true;
@@ -43,7 +45,11 @@ export default async (request: Request, context: { ip?: string }): Promise<Respo
 
   const turnstileToken = typeof parsed?.["cf-turnstile-response"] === "string" ? parsed["cf-turnstile-response"] : "";
 
-  if (!(await verifyTurnstile(turnstileToken))) {
+  if (!TURNSTILE_SECRET_KEY) {
+    return json(500, { error: "server_misconfigured" });
+  }
+
+  if (!(await verifyTurnstile(turnstileToken, context.ip))) {
     return json(400, { error: "turnstile_verification_failed" });
   }
 
