@@ -36,8 +36,9 @@ export default async (request: Request, context: { ip?: string }): Promise<Respo
   }
 
   let email = "";
+  let parsed: Record<string, unknown> = {};
   try {
-    const parsed = await request.json();
+    parsed = await request.json();
     email = typeof parsed?.email === "string" ? parsed.email.trim() : "";
   } catch {
     return json(400, { error: "invalid_json" });
