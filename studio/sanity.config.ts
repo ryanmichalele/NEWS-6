@@ -8,7 +8,7 @@ const dataset = process.env.SANITY_STUDIO_DATASET || "production";
 
 export default defineConfig({
   name: "default",
-  title: "cwn-finance",
+  title: "CWN Bank News",
   projectId,
   dataset,
   basePath: "/",

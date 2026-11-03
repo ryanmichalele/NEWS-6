@@ -1,3 +1,4 @@
+import { STUDIO_URL } from "@/config";
 import { EntityText } from "@/sanity/EntityText";
 
 export default function Footer() {
@@ -55,6 +56,14 @@ export default function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500 sm:flex-row sm:justify-between">
           <p>© 2026 CWN Live. All rights reserved.</p>
           <p>Developing story — details may change</p>
+          <a
+            href={STUDIO_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="transition-colors hover:text-white"
+          >
+            Studio
+          </a>
         </div>
       </div>
     </footer>
